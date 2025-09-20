@@ -1,1 +1,650 @@
-
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission: Bildung 3047 - Kanton Zürich Galactic</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Space+Mono&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #00ff88;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(1px 1px at 40px 70px, #fff, transparent),
+                radial-gradient(1px 1px at 50px 160px, #fff, transparent),
+                radial-gradient(2px 2px at 80px 10px, #fff, transparent);
+            background-size: 200px 200px;
+            animation: stars 20s linear infinite;
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        @keyframes stars {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-200px); }
+        }
+        
+        .game-container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(20, 25, 40, 0.95);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 
+                0 0 40px rgba(0, 255, 136, 0.3),
+                inset 0 0 20px rgba(0, 255, 136, 0.1);
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.3), inset 0 0 20px rgba(0, 255, 136, 0.1); }
+            100% { box-shadow: 0 0 60px rgba(0, 255, 136, 0.5), inset 0 0 30px rgba(0, 255, 136, 0.2); }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #00ff88;
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5em;
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .location {
+            color: #ffaa00;
+            font-size: 1.2em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .scene {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .scene.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .narrator {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 4px solid #00ff88;
+            padding: 20px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #88ffbb;
+            border-radius: 5px;
+        }
+        
+        .story-text {
+            line-height: 1.8;
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+        
+        .character {
+            display: inline-block;
+            font-size: 2em;
+            margin-right: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .choices {
+            margin-top: 30px;
+        }
+        
+        .choice-btn {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            margin: 15px 0;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.1));
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'Space Mono', monospace;
+        }
+        
+        .choice-btn:hover {
+            background: rgba(0, 255, 136, 0.3);
+            transform: translateX(10px);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, rgba(255, 68, 68, 0.2), rgba(255, 68, 68, 0.1));
+            border: 2px solid #ff4444;
+            color: #ff8888;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            animation: warningPulse 1s infinite;
+        }
+        
+        @keyframes warningPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .success {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(0, 255, 136, 0.2));
+            border: 2px solid #00ff88;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-label {
+            color: #ffaa00;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        
+        .restart-btn {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+        }
+        
+        .old-institution {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        .document {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #666;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🚀 Mission: Bildung 3047</h1>
+            <div class="location" id="location">Raumstation Zürich Prime (ehem. Limmatquai)</div>
+        </div>
+        
+        <div id="stats" class="stats">
+            <div class="stat">
+                <div class="stat-label">Mobilisierung</div>
+                <div class="stat-value" id="mobilization">0%</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Einfluss</div>
+                <div class="stat-value" id="influence">0%</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Medienreichweite</div>
+                <div class="stat-value" id="media">0%</div>
+            </div>
+        </div>
+        
+        <!-- Start Scene -->
+        <div id="start" class="scene active">
+            <div class="narrator">
+                <span class="character">📡</span>
+                Systemlog: Jahr 3047, Kanton Zürich Galactic, Status: Es ist kompliziert...
+            </div>
+            
+            <div class="story-text">
+                <p><span class="character">🚀</span> Du erwachst in deiner Schwebewohnung über dem ehemaligen Zürichsee (jetzt ein Quantenenergie-Reservoir). Durch das Fenster siehst du die schwebenden Bildungsmodule - aber auch das alte Schulhaus Hirschengraben, das immer noch da unten steht. Unverändert seit 1023 Jahren.</p>
+                
+                <p>Die <span class="character">🤖</span> Algorithmus-Räte haben theoretisch die Kontrolle - aber der <span class="old-institution">Bildungsrat Kanton Zürich</span> tagt immer noch jeden zweiten Dienstag im Monat. Mit Kaffee und Gipfeli. Physisch. Im Jahr 3047.</p>
+                
+                <p>Die <span class="character">👨‍🏫</span> Lehrpersonen? Die schicken immer noch WhatsApp-Nachrichten (ja, wirklich!) in die <span class="old-institution">LPK-Gruppe</span>, während ihre KI-Assistenten verzweifelt versuchen, die PowerPoints von 2024 zu updaten.</p>
+                
+                <div class="document">
+                    📧 Neue Mail vom Bildungsrat: "Traktandum 3.2.1: Antrag zur Prüfung der Evaluation der Möglichkeit von Hologramm-Unterricht (Erstantrag von 2847, 3. Lesung)"
+                </div>
+                
+                <p>Als Mitglied der <span class="character">🌟</span> Lernenden-Union (und gleichzeitig immer noch im <span class="old-institution">Schülerrat</span> eingetragen) hast du genug!</p>
+            </div>
+            
+            <div class="choices">
+                <button class="choice-btn" onclick="goToScene('mobilize1')">
+                    💪 Beide Systeme hacken - analog UND digital mobilisieren
+                </button>
+                <button class="choice-btn" onclick="goToScene('bildungsrat')">
+                    🎩 Zum Bildungsrat gehen (mit Anmeldeformular A38-b)
+                </button>
+                <button class="choice-btn" onclick="goToScene('socialMedia')">
+                    📱 Auf TikTok UND dem Quanten-Netz posten
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobilization Path -->
+        <div id="mobilize1" class="scene">
+            <div class="narrator">
+                <span class="character">🌟</span>
+                Geheimtreffen: Holografischer Zoom-Call trifft auf physisches Sitzungszimmer
+            </div>
+            
+            <div class="story-text">
+                <p>Du organisierst ein hybrides Treffen. Die Hälfte der Lernenden erscheint als Hologramm, die andere Hälfte sitzt tatsächlich im alten <span class="old-institution">Singsaal des Schulhauses</span>.</p>
+                
+                <p><span class="character">👩‍🏫</span> Frau Müller (Lehrerin seit 2989, immer noch mit Kreidstafel): "Also ich finde ja, wir sollten mal einen Brief an den <span class="old-institution">Kantonsrat</span> schreiben..."</p>
+                
+                <p><span class="character">🔧</span> Ein Techno-Reformer unterbricht: "Brief? Wir infiltrieren das Quanten-Netzwerk! Aber..." er seufzt, "wir müssen trotzdem das <span class="old-institution">offizielle Gesuchsformular</span> ausfüllen. In dreifacher Ausführung."</p>
+                
+                <div class="document">
+                    📋 LPK-Protokoll Nr. 4'847'293: "Die Pausenaufsicht wird weiterhin analog durchgeführt. Der Antrag auf Drohnen-Unterstützung wurde vertagt."
+                </div>
+            </div>
+            
+            <div class="choices">
+                <button class="choice-btn" onclick="goToScene('viralCampaign')">
+                    🎮 #BildungUpdate3047 auf Instagram starten (und Holo-TikTok)
+                </button>
+                <button class="choice-btn" onclick="goToScene('infiltrateLPK')">
+                    🕵️ Den nächsten LPK infiltrieren (mit Kuchen!)
+                </button>
+                <button class="choice-btn" onclick="goToScene('fail1')">
+                    📢 Demo vor dem Kantonsratssaal (ohne Bewilligung)
+                </button>
+            </div>
+        </div>
+        
+        <!-- Viral Campaign -->
+        <div id="viralCampaign" class="scene">
+            <div class="narrator">
+                <span class="character">✨</span>
+                Mobilisierung +30% | Medien-Chaos: NZZ vs. Galactic Times
+            </div>
+            
+            <div class="story-text">
+                <p>Brillant! Dein #BildungUpdate3047 trendet auf dem uralten Instagram (12 Mio Follower, meist Lehrpersonen über 900) UND im Quanten-Netz!</p>
+                
+                <p><span class="character">📰</span> Die <span class="old-institution">NZZ</span> (print UND holografisch): "Jugendliche fordern Abschaffung der Wandtafel - Wo führt das hin?"</p>
+                
+                <p><span class="character">📺</span> Der <span class="old-institution">Tages-Anzeiger</span> kontert mit einem 47-teiligen Scrollytelling: "Warum die Kreidestaublobby uns alle belügt"</p>
+                
+                <p>Die <span class="old-institution">Schulleitung</span> beruft eine Krisensitzung ein - per Papier-Einladung UND Hologramm-Ping.</p>
+                
+                <div class="document">
+                    🔔 WhatsApp-Nachricht in der Lehrer-Gruppe: "Liebi Kollegä, mir müend über das TikTok-Dingens rede... Wer bringt Zopf mit?"
+                </div>
+            </div>
+            
+            <div class="choices">
+                <button class="choice-btn" onclick="goToScene('mediaWar')">
+                    🎤 Medienkonferenz im Rathaus (mit QR-Code UND Pressemappe)
+                </button>
+                <button class="choice-btn" onclick="goToScene('hackBildungsrat')">
+                    💻 Den Bildungsrat-Server hacken (er läuft noch auf Windows 95)
+                </button>
+            </div>
+        </div>
+        
+        <!-- Infiltrate LPK -->
+        <div id="infiltrateLPK" class="scene">
+            <div class="narrator">
+                <span class="character">🍰</span>
+                LPK-Sitzung 87'456 - Mit Rüeblitorte infiltriert!
+            </div>
+            
+            <div class="story-text">
+                <p>Du schleichst dich in die <span class="old-institution">LPK-Sitzung</span> ein. Der Trick? Selbstgebackener Kuchen. Funktioniert seit 1000 Jahren.</p>
+                
+                <p><span class="character">👨‍🏫</span> Herr Meier (Mathelehrer, benutzt noch einen Taschenrechner): "Also, Traktandum 1: Die Kreide ist schon wieder alle..."</p>
+                
+                <p>Du ergreifst das Wort: "Liebe Lehrpersonen, was wenn ich euch sage, dass Lernende SELBST entscheiden könnten, wie sie lernen?"</p>
+                
+                <p>Stille. Dann: <span class="character">👩‍🏫</span> "Aber... aber wer macht dann die Jahresplanung? Das Excel von 2023?"</p>
+                
+                <div class="document">
+                    📊 Abstimmungsresultat: 12 dafür (die Jungen), 47 dagegen (haben Angst vor Veränderung), 23 Enthaltungen (waren am Handy)
+                </div>
+            </div>
+            
+            <div class="choices">
+                <button class="choice-btn" onclick="goToScene('youngerTeachers')">
+                    🌱 Die jüngeren Lehrpersonen (unter 500) separat ansprechen
+                </button>
+                <button class="choice-btn" onclick="goToScene('kantonsrat')">
+                    🏛️ Direkt zum Kantonsrat (mit 1000 Unterschriften)
+                </button>
+            </div>
+        </div>
+        
+        <!-- Media War -->
+        <div id="mediaWar" class="scene">
+            <div class="narrator">
+                <span class="character">📺</span>
+                Medienkonferenz: Chaos zwischen Alt und Neu
+            </div>
+            
+            <div class="story-text">
+                <p>Die Medienkonferenz ist surreal. <span class="old-institution">SRF</span> ist mit einem klassischen Kamerateam da, daneben schweben Hologramm-Reporter.</p>
+                
+                <p>"Werte Mitbürger von Zürich Prime," beginnst du, "warum läuft im Jahr 3047 die Bildung noch wie 2024? Der <span class="old-institution">Bildungsrat</span> braucht 6 Monate für eine Email-Antwort!"</p>
+                
+                <p><span class="character">🤖</span> Die Algorithmus-Räte senden eine Warnung - per Fax an die <span class="old-institution">Bildungsdirektion</span>.</p>
+                
+                <p><span class="character">📰</span> Die <span class="old-institution">WOZ</span> jubelt: "Endlich! Revolution!" während die <span class="old-institution">Weltwoche</span> titelt: "Woke Schüler wollen Anarchie!"</p>
+                
+                <div class="document">
+                    💬 20 Minuten Online Umfrage: "Soll die Wandtafel bleiben?" 
+                    Ja: 67% (Durchschnittsalter: 847 Jahre)
+                    Nein: 33% (Alle unter 200)
+                </div>
+            </div>
+            
+            <div class="choices">
+                <button class="choice-btn" onclick="goToScene('demonstratePower')">
+                    🎓 Live-Demo: Quantenphysik lernen OHNE Wandtafel
+                </button>
+                <button class="choice-btn" onclick="goToScene('negotiations')">
+                    🤝 Runder Tisch mit ALLEN (inkl. Hauswart)
+                </button>
+            </div>
+        </div>
+        
+        <!-- Demonstrate Power -->
+        <div id="demonstratePower" class="scene">
+            <div class="narrator">
+                <span class="character">🎯</span>
+                Die ultimative Demonstration
+            </div>
+            
+            <div class="story-text">
+                <p>Live auf allen Kanälen - von Instagram bis Quanten-Stream - zeigst du es: Lernende gestalten einen Quantenphysik-Kurs. Interaktiv. Selbstbestimmt. OHNE PowerPoint!</p>
+                
+                <p><span class="character">👩‍🏫</span> Selbst Frau Müller lässt ihre Kreide fallen: "Das... das ist ja... pädagogisch wertvoll!"</p>
+                
+                <p>Der <span class="old-institution">Bildungsrat</span> beruft eine Notfallsitzung ein. Per Email. Termin: In 3 Monaten.</p>
+                
+                <p>Aber die <span class="old-institution">Schülerorganisation Kanton Zürich</span> (ja, gibt's noch!) mobilisiert. Der <span class="old-institution">Kantonsrat</span> wird mit Petitionen überflutet - digital UND auf Papier!</p>
+                
+                <p><span class="character">🤖</span> Die Algorithmus-Räte und der <span class="old-institution">Bildungsrat</span> müssen reagieren: "System-Override... äh... Sondersitzung... Fehler... äh... Kaffepause?"</p>
+                
+                <div class="document">
+                    🚨 EILMELDUNG: Bildungsrat und KI-Räte tagen GEMEINSAM! 
+                    (Erste gemeinsame Sitzung seit dem grossen Drucker-Crash von 2745)
+                </div>
+            </div>
+            
+            <div class="choices">
+                <button class="choice-btn" onclick="goToScene('victory')">
+                    🌟 Den finalen Kompromiss vorschlagen: Hybrid-Bildung für ALLE
+                </button>
+                <button class="choice-btn" onclick="goToScene('revolution')">
+                    🔥 Komplette Revolution: Beide Systeme abschaffen!
+                </button>
+            </div>
+        </div>
+        
+        <!-- Victory -->
+        <div id="victory" class="scene">
+            <div class="success">
+                🎊 MISSION ERFOLGREICH! 🎊
+            </div>
+            
+            <div class="story-text">
+                <p><span class="character">🏆</span> Du hast es geschafft! Der <span class="old-institution">Kantonsrat</span> verabschiedet (nach nur 47 Lesungen) das "Zürcher Bildungsgesetz 3047"!</p>
+                
+                <p>Die Lösung? Ein Hybrid-System:</p>
+                <p>• Lernende können wählen zwischen KI, Hologramm, UND traditionellem Unterricht</p>
+                <p>• Die <span class="old-institution">LPK</span> darf weiter tagen (aber mit Hologramm-Option)</p>
+                <p>• PowerPoints werden zu interaktiven Quanten-Präsentationen</p>
+                <p>• Die Wandtafel bleibt - aber als nostalgisches AR-Overlay</p>
+                
+                <p><span class="character">👩‍🏫</span> Frau Müller strahlt: "Ich kann weiter mit Kreide arbeiten - aber jetzt ist es Quanten-Kreide!"</p>
+                
+                <p>Der <span class="old-institution">Tages-Anzeiger</span> titelt: "Zürich macht's vor: Bildung zwischen Tradition und Jahr 3047"</p>
+                
+                <div class="document">
+                    📜 Historisches Dokument: Erstmals unterschreiben Bildungsrat UND KI-Räte gemeinsam. 
+                    (Die Unterschrift des Bildungsrats dauerte 3 Wochen - Kuli war leer)
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">Finale Wertung</div>
+                    <div class="stat-value">⭐⭐⭐⭐⭐</div>
+                </div>
+            </div>
+            
+            <button class="restart-btn" onclick="restart()">🔄 Neue Mission starten</button>
+        </div>
+        
+        <!-- Bildungsrat Direct Approach -->
+        <div id="bildungsrat" class="scene">
+            <div class="warning">
+                ⚠️ Formular nicht korrekt ausgefüllt!
+            </div>
+            
+            <div class="story-text">
+                <p>Du stehst vor dem <span class="old-institution">Bildungsrat Kanton Zürich</span>. Das Gebäude hat sich seit 1000 Jahren nicht verändert.</p>
+                
+                <p><span class="character">👔</span> "Haben Sie Formular A38-b? Und die Bestätigung der Schulleitung? Und die Unterschrift vom LPK?"</p>
+                
+                <p>Du hast nur A38-a. Dein Antrag wird auf die nächste Sitzung vertagt. In 6 Monaten.</p>
+                
+                <p class="narrator">💭 Im Jahr 3047 ist die Bürokratie immer noch die grösste Hürde...</p>
+                
+                <div class="document">
+                    📋 Benötigte Dokumente: A38-b, C12-neu, Bestätigung XY, Protokoll der letzten LPK-Sitzung, handschriftliches Motivationsschreiben
+                </div>
+            </div>
+            
+            <button class="choice-btn" onclick="goToScene('start')">
+                ↩️ Andere Strategie versuchen
+            </button>
+        </div>
+        
+        <!-- Social Media Scene -->
+        <div id="socialMedia" class="scene">
+            <div class="story-text">
+                <p><span class="character">📱</span> Du postest auf allen Kanälen. TikTok (ja, gibt's noch!), Instagram (die Lehrpersonen sind alle dort), und dem Quanten-Netz.</p>
+                
+                <p>Dein Post: "POV: Es ist 3047 und dein Lehrer benutzt noch PowerPoint von 2024 💀"</p>
+                
+                <p>Es geht viral! Aber... <span class="old-institution">Die Schulleitung</span> schickt dir eine Email (!): "Bitte das Handy in der Schule ausschalten. MfG"</p>
+                
+                <p class="narrator">💭 Social Media allein reicht nicht. Du brauchst die alten UND neuen Strukturen...</p>
+            </div>
+            
+            <button class="choice-btn" onclick="goToScene('start')">
+                ↩️ Strategie überdenken
+            </button>
+        </div>
+        
+        <!-- Fail Scene -->
+        <div id="fail1" class="scene">
+            <div class="warning">
+                ⚠️ Demo aufgelöst - Keine Bewilligung!
+            </div>
+            
+            <div class="story-text">
+                <p>Die Demo vor dem <span class="old-institution">Kantonsrat</span> wird sofort aufgelöst. </p>
+                
+                <p><span class="character">👮</span> "Haben Sie die Bewilligung? Das Formular? In dreifacher Ausführung?"</p>
+                
+                <p>Die <span class="old-institution">NZZ</span> schreibt: "Chaoten ohne Plan" während der <span class="old-institution">Blick</span> titelt: "Schüler-Revolte GESCHEITERT!"</p>
+                
+                <p>Die <span class="old-institution">Schulleitung</span> verteilt Einträge. Auf Papier. Mit Durchschlag.</p>
+                
+                <p class="narrator">💭 Selbst im Jahr 3047 braucht man in Zürich eine Bewilligung für alles...</p>
+            </div>
+            
+            <button class="choice-btn" onclick="goToScene('mobilize1')">
+                ↩️ Zurück zum letzten Checkpoint
+            </button>
+        </div>
+        
+    </div>
+    
+    <script>
+        let gameState = {
+            mobilization: 0,
+            influence: 0,
+            media: 0,
+            currentScene: 'start'
+        };
+        
+        function goToScene(sceneId) {
+            // Hide all scenes
+            document.querySelectorAll('.scene').forEach(scene => {
+                scene.classList.remove('active');
+            });
+            
+            // Show selected scene
+            const targetScene = document.getElementById(sceneId);
+            if (targetScene) {
+                targetScene.classList.add('active');
+                gameState.currentScene = sceneId;
+                
+                // Update stats based on scene
+                updateStats(sceneId);
+                
+                // Update location
+                updateLocation(sceneId);
+            }
+        }
+        
+        function updateStats(sceneId) {
+            switch(sceneId) {
+                case 'viralCampaign':
+                    gameState.mobilization += 30;
+                    gameState.media += 20;
+                    break;
+                case 'demonstratePower':
+                    gameState.influence += 40;
+                    gameState.mobilization += 50;
+                    break;
+                case 'mediaWar':
+                    gameState.media += 35;
+                    gameState.influence += 15;
+                    break;
+                case 'infiltrateLPK':
+                    gameState.influence += 25;
+                    gameState.mobilization += 15;
+                    break;
+            }
+            
+            // Update display
+            document.getElementById('mobilization').textContent = Math.min(gameState.mobilization, 100) + '%';
+            document.getElementById('influence').textContent = Math.min(gameState.influence, 100) + '%';
+            document.getElementById('media').textContent = Math.min(gameState.media, 100) + '%';
+        }
+        
+        function updateLocation(sceneId) {
+            const locations = {
+                'start': 'Raumstation Zürich Prime (ehem. Limmatquai)',
+                'mobilize1': 'Schulhaus Hirschengraben, Singsaal 3',
+                'viralCampaign': 'Digital: TikTok & Quanten-Netz',
+                'infiltrateLPK': 'Lehrerzimmer (mit Kaffeemaschine von 2024)',
+                'mediaWar': 'Rathaus - Presseraum',
+                'demonstratePower': 'Sechseläutenplatz Hologramm-Arena',
+                'victory': 'Kantonsratssaal (endlich!)',
+                'bildungsrat': 'Bildungsdirektion - Wartezimmer',
+                'fail1': 'Vor dem Kantonsrat (Polizeiposten)'
+            };
+            
+            const locationEl = document.getElementById('location');
+            if (locations[sceneId]) {
+                locationEl.textContent = '📍 ' + locations[sceneId];
+            }
+        }
+        
+        function restart() {
+            gameState = {
+                mobilization: 0,
+                influence: 0,
+                media: 0,
+                currentScene: 'start'
+            };
+            goToScene('start');
+        }
+    </script>
+</body>
+</html>
